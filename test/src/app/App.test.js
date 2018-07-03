@@ -139,9 +139,16 @@ contract('App', function ([_, owner]) {
 
       const shouldReturnProxy = function () {
         it('should return a proxy', async function () {
-          this.proxy.address.should.be.not.null;
-          (await this.proxy.version()).should.be.eq('V1');
-          (await this.app.getProxyImplementation(this.proxy.address)).should.be.eq(this.implementation_v1.address)
+          this.proxy.address.should.be.nonzeroAddress
+
+          const version = await this.proxy.version()
+          version.should.be.eq('V1')
+
+          const implementation = await this.app.getProxyImplementation(this.proxy.address)
+          implementation.should.be.eq(this.implementation_v1.address)
+
+          const admin = await this.app.getProxyAdmin(this.proxy.address);
+          admin.should.be.eq(this.app.address())
         });
       };
 
@@ -194,8 +201,14 @@ contract('App', function ([_, owner]) {
 
       const shouldUpgradeProxy = function () {
         it('should upgrade proxy to ImplV2', async function () {
-          (await this.proxy.version()).should.be.eq('V2');
-          (await this.app.getProxyImplementation(this.proxy.address)).should.be.eq(this.implementation_v2.address)
+          const version = await this.proxy.version()
+          version.should.be.eq('V2')
+
+          const implementation = await this.app.getProxyImplementation(this.proxy.address)
+          implementation.should.be.eq(this.implementation_v2.address)
+
+          const admin = await this.app.getProxyAdmin(this.proxy.address)
+          admin.should.be.eq(this.app.address())
         });
       };
 
